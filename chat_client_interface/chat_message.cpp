@@ -1,11 +1,17 @@
-#ifndef CHAT_PARTICIPANT_H
-#define CHAT_PARTICIPANT_H
-#endif // CHAT_PARTICIPANT_H
+#ifndef CHAT_MESSAGE_H
+#define CHAT_MESSAGE_H
+
 #include <iostream>
 #include <QDateTime>
 #include <QAbstractListModel>
 #include <QStringList>
 #include <QStringListModel>
+#include "chat_data_manager.cpp"
+#include <QDebug>
+#include <QtSql/QSqlDatabase>
+#include <QtDebug>
+#include <QFileInfo>
+#include <QSqlQuery>
 
 using namespace std;
 
@@ -14,10 +20,10 @@ class chat_message
 {
 private:
     int chat_message_ID;
-    int chat_user_ID;
-    int session_ID;
-    string message;
-    QDateTime transactio_date;
+    int chat_recipient_ID;
+    int chat_sender_ID;
+    QString chat_text;
+    QDateTime creation_date;
 
 public:
 
@@ -31,73 +37,102 @@ public:
         this->chat_message_ID = chat_message_ID;
     }
 
-    int getchat_user_ID(int chat_user_ID)
+    int getchat_recipient_ID(int chat_recipient_ID)
     {
-        return chat_user_ID;
+        return chat_recipient_ID;
     }
 
-    void setchat_user_ID(int  chat_user_ID)
+    void setchat_recipient_ID(int  chat_recipient_ID)
     {
-        this->chat_user_ID = chat_user_ID;
+        this->chat_recipient_ID = chat_recipient_ID;
     }
-    int getsession_ID()
+    int getchat_sender_ID()
     {
-        return session_ID;
-    }
-
-    void setsession_ID(int session_ID)
-    {
-        this->session_ID = session_ID;
-    }
-    string getmessage()
-    {
-        return message;
+        return chat_sender_ID;
     }
 
-    void setmessage(string  message)
+    void setchat_sender_ID(int chat_sender_ID)
     {
-        this->message = message;
+        this->chat_sender_ID = chat_sender_ID;
     }
-    void setdatetime(QDateTime transactio_date)
+    QString getchat_message()
     {
-        this->transactio_date = transactio_date;
+        return chat_text;
+    }
+
+    void setchat_message(QString  chat_text)
+    {
+        this->chat_text = chat_text;
+    }
+    void setdatetime(QDateTime creation_date)
+    {
+        this->creation_date = creation_date;
     }
 
     chat_message()
     {
 
     }
-    void save_chat_message();
+    //int save_chat_message();
     QStringListModel get_chat_message_by_session_ID(int session_ID);
-    QStringListModel get_chat_message_by_user_ID(int chat_user_ID);
+    QStringListModel get_chat_message_by_user_ID(int chat_sender_ID);
     QStringListModel loadContacts();
     void send_emoji();
 
+
+int save_chat_message(QString chat_text, int chat_sender_ID, int chat_recipient_ID, QString emoji)
+{
+    chat_message new_chat_message;
+    chat_data_manager data_manager;
+    bool status = false;
+    int rowcount = 0;
+    QString str_recipient_id = QString::number(chat_recipient_ID);
+    QString str_sender_id = QString::number(chat_sender_ID);
+    try
+    {
+          if (data_manager.open_db_connection() == true)
+            {
+                QSqlQuery query;
+                query.prepare("INSERT INTO tb_chat_message (chat_sender_ID, chat_recipient_ID, chat_message, chat_emoji, creation_date, "") "
+                              "VALUES ('"+str_sender_id+"', '"+str_recipient_id+"', '"+chat_text+"', ""datetime('now'))," "''");
+
+                if (query.exec() == true)
+                {
+                    status = true;
+                }
+                else
+                {
+                    status = false;
+                }
+            }
+        else
+        {
+            qDebug() << "profile could not be submitted";
+        }
+    }
+    catch (QException &ex)
+    {
+        qDebug() << " +"; ex ;
+    }
+     data_manager.close_db_connection();
+    return status;
+}
+
+QStringList get_chat_message_history_by_user_ID(int chat_sender_ID)
+{
+    QStringList list;
+    QString text = "data in list view";
+    return list << text;
+}
+
+QStringList get_message_history_by_session_ID(int chat_recipient_ID)
+{
+    QStringList list;
+    QString text = "data in list view";
+    return list << text;
+}
+
 };
 
-chat_message new_chat_message;
 
-void save_chat_message(int msg_ID, int chat_user_ID, int session_ID, string chat_msg, QDateTime tran_time)
-{
-
-    new_chat_message.setchat_message_ID(msg_ID);
-    new_chat_message.setchat_user_ID(chat_user_ID);
-    new_chat_message.setsession_ID(session_ID);
-    new_chat_message.setmessage(chat_msg);
-    new_chat_message.setdatetime(tran_time);
-}
-
-QStringList get_chat_message_history_by_user_ID(int chat_user_ID)
-{
-    QStringList list;
-    QString text = "data in list view";
-    return list << text;
-}
-
-QStringList get_message_history_by_session_ID(int session_ID)
-{
-    QStringList list;
-    QString text = "data in list view";
-    return list << text;
-}
-
+#endif // CHAT_MESSAGE_H

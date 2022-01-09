@@ -20,11 +20,5 @@ chat_home::~chat_home()
 
 void chat_home::on_pushButton_send_clicked()
 {
-    QStringListModel model; //= new QStringListModel(this);
-    QStringList list;
-    QString text = ui->lineEdit_chat->text();
-    list << text;
-    model.setStringList(list);
-    ui->listView_messages->setModel(new QStringListModel(list));
-    ui->lineEdit_chat->setText(" ");
+
 }

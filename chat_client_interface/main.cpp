@@ -1,7 +1,7 @@
 #include "chat_application.h"
 #include "chat_participant.cpp"
 #include "chat_tcp_client.cpp"
-
+#include <QMessageBox>
 #include <QApplication>
 
 #include <iostream>
@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     chat_application w;
     w.show();
+
 
     /*
     try

@@ -1,4 +1,4 @@
-QT       += core gui sql
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,21 +16,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    chat_data_manager.cpp \
-    chat_home.cpp \
-    chat_message.cpp \
-    chat_participant.cpp \
-    chat_tcp_client.cpp \
     main.cpp \
-    chat_application.cpp
+    chat_client_test.cpp
 
 HEADERS += \
-    chat_application.h \
-    chat_home.h
+    chat_client_test.h
 
 FORMS += \
-    chat_application.ui \
-    chat_home.ui
+    chat_client_test.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
