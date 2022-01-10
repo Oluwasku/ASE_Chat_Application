@@ -1,6 +1,6 @@
-#ifndef CHAT_PARTICIPANT_H
-#define CHAT_PARTICIPANT_H
-#endif // CHAT_PARTICIPANT_H
+#ifndef CHAT_CONNECTION_H
+#define CHAT_CONNECTION_H
+#endif // CHAT_CONNECTION_H
 #include <iostream>
 #include <QDateTime>
 #include <boost/asio.hpp>
@@ -14,6 +14,12 @@ using ip::tcp;
 using std::cout;
 using std::endl;
 
+/**
+ * @brief The con_handler class
+ * This is the connection class responsible for creating the connection
+ * between the client and the server and vice versa.
+ * Code courtesy of class lab.
+ */
 class con_handler : public boost::enable_shared_from_this<con_handler>
 {
 private:
@@ -25,7 +31,10 @@ private:
 public:
 
 typedef boost::shared_ptr<con_handler> pointer;
-
+  /**
+  * @brief con_handler
+  * @param io_context
+  */
  con_handler(boost::asio::io_context& io_context)
     : sock(io_context)
   {
@@ -40,7 +49,9 @@ typedef boost::shared_ptr<con_handler> pointer;
   {
     return sock;
   }
-
+  /**
+   * @brief start method to bring the server and connection alive
+   */
   void start()
   {
     sock.async_read_some(
@@ -59,8 +70,7 @@ typedef boost::shared_ptr<con_handler> pointer;
                 boost::asio::placeholders::bytes_transferred));
   }
 
-  //void handle_read(const boost::system::error_code& err,
-                  // size_t bytes_transferred)
+/// Handle the read operation from the socket
   void handle_read(const boost::system::error_code& err, size_t bytes_transferred)
   {
     if (!err) {
@@ -87,6 +97,9 @@ std::cerr << "err (recv): " << err.message() << std::endl;
 
 };
 
+/** this is the server class responsible for listening for connection, receiving and sending
+ * the message between chatt parties.
+ */
 class Server
 {
 
@@ -95,32 +108,31 @@ private:
   boost::asio::io_context io_context;
 
 public:
-  //tcp::acceptor acceptor_;
+  ///tcp::acceptor acceptor_;
 void start_accept()
   {
-    // creates a socket
+    ///creates a socket
     con_handler::con_handler::pointer connection =
       con_handler::con_handler::create(io_context);
 
-    // initiates an asynchronous accept operation
-    // to wait for a new connection.
+    /** initiates an asynchronous accept operation to wait for a new connection.*/
     acceptor_.async_accept(connection->socket(),
         boost::bind(&Server::handle_accept, this, connection,
           boost::asio::placeholders::error));
   }
-//public:
+    /** Servere constructor implementation */
   Server(boost::asio::io_context& io_context): acceptor_(io_context, tcp::endpoint(tcp::v4(), 1234))
   {
      start_accept();
   }
-
+    /// Accepts connection from the clients socket
   void handle_accept(con_handler::pointer connection,
                      const boost::system::error_code& err)
   {
     if (!err) {
       connection->start();
     }
-    start_accept();
+    start_accept();  /// this here to keep the server listening always.
   }
 
 };

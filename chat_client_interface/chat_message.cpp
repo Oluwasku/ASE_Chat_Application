@@ -15,71 +15,131 @@
 
 using namespace std;
 
+/**
+ * @brief The chat_message class describes the message entity
+ */
 
 class chat_message
 {
 private:
-    int chat_message_ID;
+    int chat_message_ID;  //
     int chat_recipient_ID;
     int chat_sender_ID;
     QString chat_text;
     QDateTime creation_date;
 
 public:
-
+    /**
+     * @brief getchat_message_ID
+     * @param chat_message_ID
+     * @return
+     */
     int getchat_message_ID(int chat_message_ID)
     {
         return chat_message_ID;
     }
-
+    /**
+     * @brief setchat_message_ID
+     * @param chat_message_ID
+     */
     void setchat_message_ID(int  chat_message_ID)
     {
         this->chat_message_ID = chat_message_ID;
     }
-
+    /**
+     * @brief getchat_recipient_ID
+     * @param chat_recipient_ID
+     * @return
+     */
     int getchat_recipient_ID(int chat_recipient_ID)
     {
         return chat_recipient_ID;
     }
-
+    /**
+     * @brief setchat_recipient_ID
+     * @param chat_recipient_ID
+     */
     void setchat_recipient_ID(int  chat_recipient_ID)
     {
         this->chat_recipient_ID = chat_recipient_ID;
     }
+    /**
+     * @brief getchat_sender_ID
+     * @return
+     */
     int getchat_sender_ID()
     {
         return chat_sender_ID;
     }
-
+    /**
+     * @brief setchat_sender_ID
+     * @param chat_sender_ID
+     */
     void setchat_sender_ID(int chat_sender_ID)
     {
         this->chat_sender_ID = chat_sender_ID;
     }
+    /**
+     * @brief getchat_message
+     * @return
+     */
     QString getchat_message()
     {
         return chat_text;
     }
-
+    /**
+     * @brief setchat_message
+     * @param chat_text
+     */
     void setchat_message(QString  chat_text)
     {
         this->chat_text = chat_text;
     }
+    /**
+     * @brief setdatetime
+     * @param creation_date
+     */
     void setdatetime(QDateTime creation_date)
     {
         this->creation_date = creation_date;
     }
-
+    /**
+     * @brief chat_message
+     */
     chat_message()
     {
 
     }
-    //int save_chat_message();
+    /**
+     * @brief get_chat_message_by_session_ID
+     * @param session_ID
+     * @return
+     */
     QStringListModel get_chat_message_by_session_ID(int session_ID);
+    /**
+     * @brief get_chat_message_by_user_ID
+     * @param chat_sender_ID
+     * @return
+     */
     QStringListModel get_chat_message_by_user_ID(int chat_sender_ID);
+    /**
+     * @brief loadContacts
+     * @return
+     */
     QStringListModel loadContacts();
+    /**
+     * @brief send_emoji
+     */
     void send_emoji();
 
-
+    /**
+ * @brief save_chat_message
+ * @param chat_text
+ * @param chat_sender_ID
+ * @param chat_recipient_ID
+ * @param emoji
+ * @return
+ */
 int save_chat_message(QString chat_text, int chat_sender_ID, int chat_recipient_ID, QString emoji)
 {
     chat_message new_chat_message;
@@ -118,6 +178,11 @@ int save_chat_message(QString chat_text, int chat_sender_ID, int chat_recipient_
     return status;
 }
 
+/**
+ * @brief get_chat_message_history_by_user_ID
+ * @param chat_sender_ID
+ * @return
+ */
 QStringList get_chat_message_history_by_user_ID(int chat_sender_ID)
 {
     QStringList list;

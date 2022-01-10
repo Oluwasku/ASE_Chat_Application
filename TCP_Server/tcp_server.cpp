@@ -10,7 +10,9 @@ using ip::tcp;
 using std::cout;
 using std::endl;
 
-
+/**
+ * @brief The con_handler class
+ */
 class con_handler : public boost::enable_shared_from_this<con_handler>
 {
 private:
@@ -37,6 +39,9 @@ typedef boost::shared_ptr<con_handler> pointer;
     return sock;
   }
 
+  /**
+   * @brief start
+   */
   void start()
   {
     sock.async_read_some(
@@ -55,14 +60,11 @@ typedef boost::shared_ptr<con_handler> pointer;
                 boost::asio::placeholders::bytes_transferred));
   }
 
-  //void handle_read(const boost::system::error_code& err,
-                  // size_t bytes_transferred)
+
   void handle_read(const boost::system::error_code& err, size_t bytes_transferred)
   {
     if (!err) {
       cout << data << endl;
-
-
 
     } else {
 std::cerr << "err (recv): " << err.message() << std::endl;
@@ -83,6 +85,10 @@ std::cerr << "err (recv): " << err.message() << std::endl;
 
 };
 
+
+/**
+ * @brief The Server class
+ */
 class Server
 {
 

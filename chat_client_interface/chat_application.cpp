@@ -1,8 +1,9 @@
 #include "chat_application.h"
 #include "ui_chat_application.h"
-#include "chat_tcp_client.cpp"
+//#include "chat_tcp_client.cpp"
 #include "chat_participant.cpp"
 #include "chat_data_manager.cpp"
+#include "chat_connection.cpp"
 #include "chat_message.cpp"
 #include <QAbstractListModel>
 #include <QStringList>
@@ -32,7 +33,49 @@ chat_application::chat_application(QWidget *parent)
 {
     ui->setupUi(this);
 
+
     // Connect to server
+    try
+    {
+        boost::asio::io_service io_service;
+        //socket creation
+        tcp::socket socket(io_service);
+        //connection
+        socket.connect( tcp::endpoint( boost::asio::ip::address::from_string("127.0.0.1"), 1234 ));
+        // request/message from client
+        const QString msg = "Hello from Client!\n";
+        //QString str_chat_participant_ID = QString::QString();
+        boost::system::error_code error;
+        boost::asio::write( socket, boost::asio::buffer(msg.toStdString()), error );
+        if( !error )
+        {
+            cout << "Client sent hello message!" << endl;
+            ui->label_10->setText("Client sent hello message");
+        }
+        else {
+            cout << "send failed: " << error.message() << endl;
+            ui->label_11->setText("send failed");
+        }
+        // getting response from server
+        boost::asio::streambuf receive_buffer;
+        boost::asio::read(socket, receive_buffer, boost::asio::transfer_all(), error);
+        if( error && error != boost::asio::error::eof ) {
+            cout << "receive failed: " << error.message() << endl;
+            ui->label_12->setText("receive failed");
+        }
+        else
+        {
+            const char* data = boost::asio::buffer_cast<const char*>(receive_buffer.data());
+            cout << data << endl;
+            QString test = data;
+             ui->label_13->setText(test);
+        }
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << endl;
+    }
+    //return 0;
 
 
 
@@ -96,7 +139,7 @@ void chat_application::on_pushButton_register_clicked()
     chat_participant new_participant;
     if (new_participant.submit_profile(ui->lineEdit_firstname->text(),
      ui->lineEdit_lastname->text(), ui->lineEdit_email->text(),
-     ui->lineEdit_username1->text(), ui->lineEdit_picture->text(),
+     /*ui->lineEdit_username1->text(), ui->lineEdit_picture->text(),*/
      ui->lineEdit_password_2->text()) == true)
     {
         ui->label_15->setText("Registration successful");
@@ -126,7 +169,56 @@ void chat_application::on_pushButton_userlogin_clicked()
     {
          ui->label_15->setText("Login successful");
          // load all contacts.
-        new_participant.load_all_Contacts(1);
+        //new_participant.load_all_Contacts(1);
+
+
+         // Initiate a chat connectionn to the server
+         // Connect to server
+         try
+         {
+             boost::asio::io_service io_service;
+             //socket creation
+             tcp::socket socket(io_service);
+             //connection
+             socket.connect( tcp::endpoint( boost::asio::ip::address::from_string("127.0.0.1"), 1234 ));
+             con_handler newconnection(io_service);
+             newconnection.start();
+             // request/message from client
+             const QString msg = "Hello from Client!\n";
+             //QString str_chat_participant_ID = QString::QString();
+             boost::system::error_code error;
+             boost::asio::write( socket, boost::asio::buffer(msg.toStdString()), error );
+             if( !error )
+             {
+                 cout << "Client sent hello message!" << endl;
+                 ui->label_10->setText("Client sent hello message");
+             }
+             else {
+                 cout << "send failed: " << error.message() << endl;
+                 ui->label_11->setText("send failed");
+             }
+             // getting response from server
+             boost::asio::streambuf receive_buffer;
+             boost::asio::read(socket, receive_buffer, boost::asio::transfer_all(), error);
+             if( error && error != boost::asio::error::eof ) {
+                 cout << "receive failed: " << error.message() << endl;
+                 ui->label_12->setText("receive failed");
+             }
+             else
+             {
+                 const char* data = boost::asio::buffer_cast<const char*>(receive_buffer.data());
+                 cout << data << endl;
+                 QString test = data;
+                  ui->label_13->setText(test);
+             }
+         }
+         catch (std::exception& e)
+         {
+             std::cerr << e.what() << endl;
+         }
+         //return 0;
+
+
 
     }
     else if(login_status < 1)
@@ -143,10 +235,8 @@ void chat_application::on_pushButton_update_clicked()
     // call chat_participant object method to submit registration
     chat_participant new_participant;
     //QString str = QString::number(6);
-    if (new_participant.update_profile( 6, ui->lineEdit_firstname->text(),
-     ui->lineEdit_lastname->text(), ui->lineEdit_username1->text(),
-     ui->lineEdit_email->text(),
-     ui->lineEdit_password_2->text()) == true)
+    if (new_participant.update_profile( 6, ui->lineEdit_lastname->text(), ui->lineEdit_username1->text(),
+     ui->lineEdit_email->text(), ui->lineEdit_password_2->text()) == true)
     {
         ui->label_15->setText("Update successful");
     }

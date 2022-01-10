@@ -18,6 +18,12 @@ public:
 private slots:
     void on_pushButton_send_clicked();
 
+    void on_pushButton_userlogin_clicked();
+
+    void on_pushButton_register_clicked();
+
+    void on_pushButton_update_clicked();
+
 private:
     Ui::chat_home *ui;
 };

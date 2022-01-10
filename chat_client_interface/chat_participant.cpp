@@ -16,9 +16,15 @@
 #include <QDateTime>
 #include <QCryptographicHash>
 #include <QDataStream>
+#include <QList>
 
 using namespace std;
 
+/**
+ * @brief The chat_participant class
+ * Represents the chat participant or chat user object.
+ *
+ */
 
 class chat_participant
 {
@@ -33,125 +39,195 @@ private:
     QDateTime creation_date = QDateTime::currentDateTime();
 
 public:
-
+    /**
+     * @brief getchat_participant_ID
+     * @return
+     */
     int getchat_participant_ID()
     {
         return chat_participant_ID;
     }
+    /**
+     * @brief setfirstname
+     * @param chat_participant_ID
+     */
 
     void setfirstname(int  chat_participant_ID)
     {
         this->chat_participant_ID = chat_participant_ID;
     }
-
+    /**
+     * @brief getfirstname
+     * @return
+     */
     QString getfirstname()
     {
         return firstname;
     }
-
+    /**
+     * @brief setfirstname
+     * @param firstname
+     */
     void setfirstname(QString  firstname)
     {
         this->firstname = firstname;
     }
-
+    /**
+     * @brief getlastname
+     * @return
+     */
     QString getlastname()
     {
         return lastname;
     }
-
+    /**
+     * @brief setlastname
+     * @param lastname
+     */
     void setlastname(QString  lastname)
     {
         this->lastname = lastname;
     }
-
+    /**
+     * @brief getusername
+     * @return
+     */
     QString getusername()
     {
         return username;
     }
-
+    /**
+     * @brief setusername
+     * @param username
+     */
     void setusername(QString  username)
     {
         this->username = username;
     }
-
+    /**
+     * @brief getpicture
+     * @return
+     */
     QString getpicture()
     {
         return picture;
     }
-
+    /**
+     * @brief setpicture
+     * @param picture
+     */
     void setpicture(QString  picture)
-    {//ui->label_14->setText("connection opened");
-        // QSqlQuery query("SELECT * FROM tb_chat_participant where username "
-        //"= '" +ui->lineEdit_Username->text() +"' and password ='"+ ui->lineEdit_password->text() + "'");
+    {
         this->picture = picture;
     }
-
+    /**
+     * @brief getemail
+     * @return
+     */
     QString getemail()
     {
         return email;
     }
-
+    /**
+     * @brief setemail
+     * @param email
+     */
     void setemail(QString  email)
     {
         this->email = email;
     }
-
+    /**
+     * @brief getpassword
+     * @return
+     */
     QString getpassword()
     {
         return password;
     }
-
+    /**
+     * @brief setpassword
+     * @param password
+     */
     void setpassword(QString  password)
     {
         this->password = password;
     }
-
+    /**
+     * @brief getcreation_date
+     * @return
+     */
     QDateTime getcreation_date()
     {
         return creation_date;
     }
-
+    /**
+     * @brief setcreation_date
+     * @param creation_date
+     */
     void setcreation_date(QDateTime creation_date)
     {
         this->creation_date = creation_date;
     }
 
-
-    //bool submit_profile(QString fname, QString lname, QString uname, QString mail, QString pswd, QString picfilepath);
-    //bool update_profile();
-    //bool submit_profile();
+    /**
+     * @brief upload_Picture
+     */
     void upload_Picture();
-    //void load_all_Contacts();
+    /**
+     * @brief load_all_Contacts
+     */
+    void load_all_Contacts();
+    /**
+     * @brief chat_participant_login
+     * @return
+     */
     bool chat_participant_login();
+    /**
+     * @brief view_active_contacts
+     * @return
+     */
     QStringList view_active_contacts();
 
+    /**
+     * @brief password_encryption
+     * @param password
+     */
     void password_encryption(QString password)
     {
 
-
     }
 
-
+    /**
+     * @brief chat_participant_login
+     * @param username
+     * @param password
+     * @return
+     */
     int chat_participant_login(QString username, QString password)
     {
-       int rowcount = 0;
+       int rowcount = -1;
+       int user_id = -1;
+       //QString user_id;
         chat_data_manager data_manager;
         try
         {
-
             if (data_manager.open_db_connection())
             {
                 QSqlQuery query;
-                query.prepare("SELECT * FROM tb_chat_participant where username='"+username+"' and password='"+password+"'");
-
+                query.prepare("SELECT * FROM tb_chat_participant where "
+                              "username='"+username+"' and password='"+password+"'");
                 if (query.exec() == true)
                 {
-                    rowcount = query.numRowsAffected();
+                    rowcount = query.size();
                     while (query.next())
                     {
-                        rowcount++;
-                    }
-                }                
+                        user_id = query.value(0).toInt();
+                     }
+                }
+                else
+                {
+                    user_id = 0;
+                }
             }
         }
         catch (QException &ex)
@@ -160,12 +236,20 @@ public:
 
         }
         data_manager.close_db_connection();
-        return rowcount;
+        return user_id;
         }
 
 
-//Class method to submit new chat participant profile
-bool submit_profile(QString firstname, QString lastname, QString email, QString username, QString picfilepath, QString password)
+//
+    /**
+ * @brief submit_profile - Class method to submit new chat participant profile
+ * @param username
+ * @param fullname
+ * @param email
+ * @param password
+ * @return
+ */
+bool submit_profile(QString username, QString fullname, QString email, QString password)
  {
     chat_participant new_chat_perticipant;
     chat_data_manager data_manager;
@@ -175,13 +259,11 @@ bool submit_profile(QString firstname, QString lastname, QString email, QString 
         if (data_manager.open_db_connection() == true)
         {
             QSqlQuery query;
-            query.prepare("INSERT INTO tb_chat_participant (firstname, lastname, email, username, picture, password, creation_date) "
+            query.prepare("INSERT INTO tb_chat_participant (username, fullname, email, password, creation_date)"
                           "VALUES ("
-                          "'" + firstname +"', "
-                          "'" + lastname +"', "
-                          "'" + email +"', "
                           "'" + username +"', "
-                          "'" + picfilepath +"', "
+                          "'" + fullname +"', "
+                          "'" + email +"', "
                           "'" + password +"', "
                           "datetime('now'))");
 
@@ -207,7 +289,16 @@ bool submit_profile(QString firstname, QString lastname, QString email, QString 
     return status;
 }
 
-bool update_profile(int chat_participant_ID, QString firstname, QString lastname, QString username, QString email, QString password)
+/**
+ * @brief update_profile
+ * @param chat_participant_ID
+ * @param username
+ * @param fullname
+ * @param email
+ * @param password
+ * @return
+ */
+bool update_profile(int chat_participant_ID, QString username, QString fullname, QString email, QString password)
 {
     chat_participant new_chat_perticipant;
     chat_data_manager data_manager;
@@ -218,8 +309,8 @@ bool update_profile(int chat_participant_ID, QString firstname, QString lastname
         if (data_manager.open_db_connection())
         {
             QSqlQuery query;
-            query.prepare("UPDATE tb_chat_participant SET firstname='"+firstname+"', lastname='"+lastname+"', "
-                          "username='"+username+"', email='"+email+"', password='"+password+"', "
+            query.prepare("UPDATE tb_chat_participant SET username='"+username+"', fullname='"+fullname+"', "
+                          "username='"+email+"', password='"+password+"', "
                           "creation_date=datetime('now') WHERE chat_participant_ID='"+str_chat_participant_ID+"'");
 
             if (query.exec())
@@ -244,35 +335,25 @@ bool update_profile(int chat_participant_ID, QString firstname, QString lastname
     return status;
 }
 
-int load_all_Contacts(int chat_participant_ID)
+/**
+ * @brief load_all_Contacts
+ * @param chat_sender_ID
+ * @return
+ */
+QListData load_all_Contacts(int chat_sender_ID)
 {
     chat_data_manager data_manager;
-    bool status = false;
-    QString str_chat_participant_ID = QString::number(1);
-    int rowcount = 0;
+    QString str_chat_participant_ID = QString::number(chat_sender_ID);
+    QListData list;
     try
     {
         if (data_manager.open_db_connection())
         {
             QSqlQuery query;
-            query.prepare("SELECT  DISTINCT tb_chat_message.chat_sender_ID, tb_chat_message.chat_recipient_ID, "
-                          "(SELECT DISTINCT username FROM tb_chat_participant "
-                            "WHERE tb_chat_participant.chat_participant_ID = tb_chat_message.chat_sender_ID )"
-                       "FROM tb_chat_message"
-                       "WHERE chat_recipient_ID = 1"
-                       "ORDER BY creation_date");
+            query.prepare("select * FROM tb_chat_message WHERE chat_sender_ID = '"+str_chat_participant_ID+"'");
+            query.exec();
 
-            //query.prepare("SELECT DISTINCT username FROM tb_chat_participant RIGHT JOIN tb_chat_message ON tb_chat_message.chat_recipient_ID = tb_chat_participant.chat_participant_ID WHERE chat_sender_ID = '"+str_chat_participant_ID+"' ORDER BY tb_chat_message.creation_date DESC;");
-            //query.prepare("SELECT * FROM tb_chat_participant");
-            if (query.exec() == true)
-            {
-                rowcount = query.numRowsAffected();
-                while (query.next())
-                {
-                    rowcount++;
-                }
-            }
-        }
+         }
         else
         {
             qDebug() << "DB connection not opened";
@@ -283,7 +364,7 @@ int load_all_Contacts(int chat_participant_ID)
         qDebug() << "DB connection not opened";
     }
     data_manager.close_db_connection();
-        return rowcount;
+        return list;
 }
 
 

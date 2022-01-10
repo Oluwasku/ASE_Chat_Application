@@ -17,15 +17,15 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+    /** this code snipet starts the server
+      */
     try
     {
-        cout << "Server started successfully!"<< endl;
         boost::asio::io_service io_service;
         Server newServer(io_service);
         io_service.run();
-
-
-     } catch (std::exception& e)
+     }
+    catch (std::exception& e)
      {
             std::cerr << e.what() << endl;
      }
